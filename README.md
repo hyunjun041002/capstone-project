@@ -77,20 +77,6 @@
 
 <br/>
 
-## 🖥 서비스 화면
-
-> 스크린샷은 `docs/images/` 폴더에 넣고 경로를 맞춰 주세요.
-
-| 로그인 | 면접 유형 선택 |
-|:---:|:---:|
-| <img src="docs/images/login.png" width="300"/> | <img src="docs/images/select.png" width="300"/> |
-
-| AI 면접 진행 | 피드백 결과 |
-|:---:|:---:|
-| <img src="docs/images/interview.png" width="300"/> | <img src="docs/images/feedback.png" width="300"/> |
-
-<br/>
-
 ## 🏗 시스템 아키텍처
 
 ```mermaid
