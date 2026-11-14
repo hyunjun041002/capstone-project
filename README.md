@@ -1,79 +1,208 @@
-답변연습소 (AI 면접봇)
+# 답변연습소
+
+AI 기반 모의 면접 연습 서비스
 
 컴퓨터소프트웨어학과 캡스톤 디자인 프로젝트
 
-이력서와 희망 직무를 바탕으로 AI가 면접 질문을 만들어 주고, 사용자가 작성한 답변에 피드백을 주는 면접 연습 웹 서비스입니다.
+<br/>
 
-화면
-이력서 업로드	메인 화면
-<img src="docs/images/upload.png" width="400"/>	<img src="docs/images/home.png" width="400"/>
-면접방 만들기	면접 질문 목록
-<img src="docs/images/create-room.png" width="400"/>	<img src="docs/images/interview.png" width="400"/>
-답변 피드백
-<img src="docs/images/feedback.png" width="600"/>
-주요 기능
+## 목차
 
-이력서 등록
+1. [프로젝트 소개](#프로젝트-소개)
+2. [서비스 화면](#서비스-화면)
+3. [주요 기능](#주요-기능)
+4. [시스템 구조](#시스템-구조)
+5. [기술 스택](#기술-스택)
+6. [프로젝트 구조](#프로젝트-구조)
+7. [API](#api)
+8. [실행 방법](#실행-방법)
+9. [트러블슈팅](#트러블슈팅)
 
-PDF 이력서를 올리면 Gemini가 내용을 분석해서 이름, 학력, 경력 등 사용자 정보를 저장
-이미 등록한 사용자는 휴대폰 번호로 바로 접속
+<br/>
 
-면접방 생성
+## 프로젝트 소개
 
-희망 분야(예: 백엔드 개발자)를 입력하면 면접방이 만들어지고, 이력서 정보를 반영한 질문 5개가 생성됨
-+ 버튼으로 기존 질문과 겹치지 않는 질문을 추가로 생성
-사람인 채용공고 검색으로 바로 이동하는 버튼
+### 배경
 
-답변 피드백
+면접 준비를 할 때 실전처럼 연습하고 피드백을 받을 기회가 생각보다 많지 않습니다.
+스터디는 일정을 맞추기 어렵고, 유료 컨설팅은 비용 부담이 있습니다.
 
-질문마다 답변을 작성해서 제출하면 AI 피드백을 받을 수 있음
-답변과 피드백은 DB에 저장되어 나중에 다시 확인 가능
+### 목표
 
-면접 이력
+이력서와 희망 직무를 입력하면 AI가 나에게 맞는 면접 질문을 만들어 주고,
+답변을 작성하면 바로 피드백을 받을 수 있는 서비스를 만드는 것을 목표로 했습니다.
 
-사이드바에서 지금까지 만든 면접방 목록 확인 및 삭제
-기술 스택
-구분	사용 기술
-Frontend	React 19, Vite, React Router, TanStack Query, Jotai, Axios
-Backend	Node.js, Express 5, Prisma, Multer
-DB	MySQL
-인증	JWT (쿠키)
-AI	Google Gemini API (gemini-2.5-flash)
-배포	Docker, Docker Hub, Kubernetes
-구조
+- 이력서 내용을 반영한 맞춤 질문 생성
+- 답변에 대한 AI 피드백 제공
+- 면접 기록을 저장해서 다시 확인 가능
+
+<br/>
+
+## 서비스 화면
+
+### 이력서 업로드
+
+PDF 이력서를 올리거나, 이미 등록한 경우 휴대폰 번호로 접속합니다.
+
+![이력서 업로드](docs/images/upload.png)
+
+### 메인 화면
+
+![메인 화면](docs/images/home.png)
+
+### 면접방 만들기
+
+희망 분야를 입력하면 해당 분야에 맞는 질문이 생성됩니다.
+
+![면접방 만들기](docs/images/create-room.png)
+
+### 면접 질문 목록
+
+![면접 질문 목록](docs/images/interview.png)
+
+### 답변 피드백
+
+![답변 피드백](docs/images/feedback.png)
+
+<br/>
+
+## 주요 기능
+
+### 1. 이력서 등록
+
+- PDF 이력서를 업로드하면 Gemini가 이력서를 분석해 이름, 학력, 경력, 프로젝트, 기술 스택을 DB에 저장
+- 이미 등록한 사용자는 휴대폰 번호로 바로 접속
+- 로그인 상태는 JWT 쿠키로 유지
+
+### 2. 면접방 생성
+
+| 기능 | 설명 |
+|---|---|
+| 면접방 만들기 | 희망 분야(예: 백엔드 개발자)를 입력하면 이력서 정보를 반영한 질문 5개 생성 |
+| 질문 추가 | 기존 질문과 겹치지 않는 질문을 5개씩 추가 생성 |
+| 관련 채용공고 | 희망 분야로 사람인 채용공고 검색 페이지로 이동 |
+
+### 3. 답변 피드백
+
+- 질문마다 답변을 작성해서 제출하면 AI가 답변을 분석해 피드백 제공
+- 답변과 피드백은 DB에 저장되어 나중에 다시 확인 가능
+
+### 4. 면접 이력 관리
+
+- 사이드바에서 지금까지 만든 면접방 목록 확인
+- 필요 없는 면접방 삭제
+
+<br/>
+
+## 시스템 구조
+
+```mermaid
+flowchart LR
+    U[사용자] --> F[Frontend<br/>React + Vite]
+    F -->|REST API| B[Backend<br/>Node.js / Express]
+    B --> D[(MySQL)]
+    B -->|이력서 분석 · 질문 생성 · 피드백| G[Gemini API]
+
+    subgraph Kubernetes
+        F
+        B
+        D
+    end
+```
+
+### 면접 진행 흐름
+
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant S as 서버
+    participant AI as Gemini
+
+    U->>S: 이력서 PDF 업로드
+    S->>AI: 이력서 분석 요청
+    AI-->>S: 사용자 정보 (JSON)
+    S-->>U: 로그인 완료
+    U->>S: 희망 분야 입력
+    S->>AI: 맞춤 질문 생성 요청
+    AI-->>S: 질문 5개
+    S-->>U: 면접방 생성
+    U->>S: 답변 제출
+    S->>AI: 피드백 요청
+    AI-->>S: 피드백
+    S-->>U: 피드백 표시
+```
+
+<br/>
+
+## 기술 스택
+
+| 구분 | 사용 기술 |
+|---|---|
+| Frontend | React 19, Vite, React Router, TanStack Query, Jotai, Axios |
+| Backend | Node.js, Express 5, Prisma, Multer |
+| Database | MySQL |
+| Auth | JWT (Cookie) |
+| AI | Google Gemini API (gemini-2.5-flash) |
+| Infra | Docker, Docker Hub, Kubernetes |
+| 협업 | Git, GitHub |
+
+<br/>
+
+## 프로젝트 구조
+
+```
 capstone
 ├── frontend
 │   └── src
-│       ├── page        # 화면 (이력서 업로드, 홈, 면접방)
-│       ├── components  # 모달, 로딩
-│       ├── service     # API 호출
-│       ├── network     # axios 설정
-│       └── store       # Jotai 상태
+│       ├── page          # 이력서 업로드, 홈, 면접방 화면
+│       ├── components    # 모달, 로딩
+│       ├── service       # API 호출
+│       ├── network       # axios 설정
+│       └── store         # Jotai 상태 관리
 ├── backend
-│   ├── routes          # /auth, /chatroom, /question
+│   ├── routes            # /auth, /chatroom, /question
 │   ├── controls
-│   ├── services        # AI 호출, 비즈니스 로직
-│   ├── data            # DB 접근
-│   ├── middleware      # 인증
-│   ├── prisma          # 스키마, 마이그레이션
+│   ├── services          # AI 호출, 비즈니스 로직
+│   ├── data              # DB 접근
+│   ├── middleware        # JWT 인증, JSON 추출
+│   ├── prisma            # 스키마, 마이그레이션
 │   └── utils
-├── kubernetes          # backend / frontend / mysql 배포 yaml
-└── deploy-frontend.ps1 # 프론트 이미지 빌드 및 배포 스크립트
-API
-Method	URL	설명
-POST	/auth/resume	이력서 업로드 및 분석
-POST	/auth	휴대폰 번호로 사용자 조회
-GET	/chatroom	면접방 목록
-GET	/chatroom/:id	면접방 상세 (질문 포함)
-POST	/chatroom	면접방 생성
-DELETE	/chatroom/:id	면접방 삭제
-POST	/question	질문 추가 생성
-POST	/question/feedback	답변 피드백 요청
-실행 방법
-환경 변수
+├── kubernetes            # backend / frontend / mysql 배포 yaml
+├── docs/images           # README 스크린샷
+└── deploy-frontend.ps1   # 프론트엔드 이미지 빌드 및 배포 스크립트
+```
 
-backend/.env
+<br/>
 
+## API
+
+| Method | URL | 설명 |
+|---|---|---|
+| POST | `/auth/resume` | 이력서 업로드 및 분석 |
+| POST | `/auth` | 휴대폰 번호로 사용자 조회 |
+| GET | `/chatroom` | 면접방 목록 조회 |
+| GET | `/chatroom/:id` | 면접방 상세 조회 (질문 포함) |
+| POST | `/chatroom` | 면접방 생성 |
+| DELETE | `/chatroom/:id` | 면접방 삭제 |
+| POST | `/question` | 질문 추가 생성 |
+| POST | `/question/feedback` | 답변 피드백 요청 |
+
+<br/>
+
+## 실행 방법
+
+### 1. 저장소 클론
+
+```bash
+git clone https://github.com/hyunjun041002/capstone-project.git
+cd capstone-project
+```
+
+### 2. 환경 변수 설정
+
+`backend/.env`
+
+```
 CLIENT_HOST=
 MYSQL_USER=
 MYSQL_PASSWORD=
@@ -84,34 +213,79 @@ DATABASE_URL=
 SESSION_TEXT=
 JWT_SECRET_KEY=
 GEMINI_API_KEY=
-로컬 실행
-bash
-# backend
+```
+
+### 3. 로컬 실행
+
+```bash
+# Backend
 cd backend
 npm install
 npx prisma generate
 npm run dev
 
-# frontend
+# Frontend (새 터미널)
 cd frontend
 npm install
 npm run dev
-Docker
-bash
+```
+
+### 4. Docker 실행
+
+```bash
 docker build -t capstone-backend ./backend
 docker build -t capstone-frontend ./frontend
 
 docker run -d -p 3000:3000 --env-file backend/.env capstone-backend
 docker run -d -p 5173:5173 capstone-frontend
-Kubernetes
-bash
+```
+
+### 5. Kubernetes 배포
+
+```bash
 kubectl apply -f kubernetes/sql
 kubectl apply -f kubernetes/backend
 kubectl apply -f kubernetes/frontend
+```
 
-secret.yaml은 저장소에 포함되어 있지 않으므로 직접 만들어서 적용해야 합니다.
+`secret.yaml`은 저장소에 포함되어 있지 않으므로 직접 작성해서 적용해야 합니다.
 
-개발하면서 겪은 문제
-Gemini 무료 사용량 초과 무료 API 키는 요청 횟수 제한이 있어서 시연 중에 응답이 끊기는 경우가 있었습니다. 서버에서 429 에러가 나면 프론트에서 API 키 발급 페이지로 이동하도록 처리했습니다.
-AI 응답 형식이 매번 다름 JSON으로 달라고 해도 앞뒤에 설명이 붙어서 오는 경우가 많아서, 응답에서 JSON 부분만 뽑아내는 미들웨어(json.middleware.js)를 따로 만들었습니다.
-면접방 생성 중 오류 시 데이터 꼬임 질문 생성에 실패하면 빈 면접방만 남는 문제가 있어서, 면접방 생성과 질문 저장을 Prisma 트랜잭션으로 묶었습니다.
+<br/>
+
+## 트러블슈팅
+
+<details>
+<summary><b>Gemini 무료 사용량 초과</b></summary>
+<br/>
+
+**문제**
+무료 API 키는 요청 횟수 제한이 있어서 시연 중에 응답이 오지 않는 경우가 있었습니다.
+
+**해결**
+AI 호출이 실패하면 서버에서 429 에러를 보내고, 프론트에서 이를 받아 API 키 발급 페이지로 이동하도록 처리했습니다.
+
+</details>
+
+<details>
+<summary><b>AI 응답 형식이 일정하지 않음</b></summary>
+<br/>
+
+**문제**
+JSON으로 응답하라고 해도 앞뒤에 설명이나 코드 블록이 붙어서 오는 경우가 많아 파싱에 실패했습니다.
+
+**해결**
+응답에서 JSON 부분만 잘라내는 함수(`json.middleware.js`)를 만들어 모든 AI 응답에 적용했습니다.
+
+</details>
+
+<details>
+<summary><b>면접방 생성 실패 시 빈 방이 남는 문제</b></summary>
+<br/>
+
+**문제**
+질문 생성이나 저장 중 오류가 나면 질문 없는 면접방만 DB에 남았습니다.
+
+**해결**
+면접방 생성과 질문 저장을 Prisma 트랜잭션으로 묶어서, 하나라도 실패하면 전체가 취소되도록 했습니다.
+
+</details>
