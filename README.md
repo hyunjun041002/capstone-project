@@ -1,230 +1,117 @@
-<div align="center">
+답변연습소 (AI 면접봇)
 
-# 🎤 답변연습소
+컴퓨터소프트웨어학과 캡스톤 디자인 프로젝트
 
-### AI 기반 모의 면접 코칭 서비스
+이력서와 희망 직무를 바탕으로 AI가 면접 질문을 만들어 주고, 사용자가 작성한 답변에 피드백을 주는 면접 연습 웹 서비스입니다.
 
-**질문부터 피드백까지, AI 면접관과 함께하는 실전 면접 연습**
+화면
+이력서 업로드	메인 화면
+<img src="docs/images/upload.png" width="400"/>	<img src="docs/images/home.png" width="400"/>
+면접방 만들기	면접 질문 목록
+<img src="docs/images/create-room.png" width="400"/>	<img src="docs/images/interview.png" width="400"/>
+답변 피드백
+<img src="docs/images/feedback.png" width="600"/>
+주요 기능
 
-<br/>
+이력서 등록
 
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+PDF 이력서를 올리면 Gemini가 내용을 분석해서 이름, 학력, 경력 등 사용자 정보를 저장
+이미 등록한 사용자는 휴대폰 번호로 바로 접속
 
-컴퓨터소프트웨어학과 캡스톤 디자인
+면접방 생성
 
-</div>
+희망 분야(예: 백엔드 개발자)를 입력하면 면접방이 만들어지고, 이력서 정보를 반영한 질문 5개가 생성됨
++ 버튼으로 기존 질문과 겹치지 않는 질문을 추가로 생성
+사람인 채용공고 검색으로 바로 이동하는 버튼
 
-<br/>
+답변 피드백
 
-## 📌 목차
+질문마다 답변을 작성해서 제출하면 AI 피드백을 받을 수 있음
+답변과 피드백은 DB에 저장되어 나중에 다시 확인 가능
 
-1. [프로젝트 소개](#-프로젝트-소개)
-2. [주요 기능](#-주요-기능)
-3. [서비스 화면](#-서비스-화면)
-4. [시스템 아키텍처](#-시스템-아키텍처)
-5. [기술 스택](#-기술-스택)
-6. [프로젝트 구조](#-프로젝트-구조)
-7. [시작하기](#-시작하기)
-8. [트러블슈팅](#-트러블슈팅)
+면접 이력
 
-<br/>
+사이드바에서 지금까지 만든 면접방 목록 확인 및 삭제
+기술 스택
+구분	사용 기술
+Frontend	React 19, Vite, React Router, TanStack Query, Jotai, Axios
+Backend	Node.js, Express 5, Prisma, Multer
+DB	MySQL
+인증	JWT (쿠키)
+AI	Google Gemini API (gemini-2.5-flash)
+배포	Docker, Docker Hub, Kubernetes
+구조
+capstone
+├── frontend
+│   └── src
+│       ├── page        # 화면 (이력서 업로드, 홈, 면접방)
+│       ├── components  # 모달, 로딩
+│       ├── service     # API 호출
+│       ├── network     # axios 설정
+│       └── store       # Jotai 상태
+├── backend
+│   ├── routes          # /auth, /chatroom, /question
+│   ├── controls
+│   ├── services        # AI 호출, 비즈니스 로직
+│   ├── data            # DB 접근
+│   ├── middleware      # 인증
+│   ├── prisma          # 스키마, 마이그레이션
+│   └── utils
+├── kubernetes          # backend / frontend / mysql 배포 yaml
+└── deploy-frontend.ps1 # 프론트 이미지 빌드 및 배포 스크립트
+API
+Method	URL	설명
+POST	/auth/resume	이력서 업로드 및 분석
+POST	/auth	휴대폰 번호로 사용자 조회
+GET	/chatroom	면접방 목록
+GET	/chatroom/:id	면접방 상세 (질문 포함)
+POST	/chatroom	면접방 생성
+DELETE	/chatroom/:id	면접방 삭제
+POST	/question	질문 추가 생성
+POST	/question/feedback	답변 피드백 요청
+실행 방법
+환경 변수
 
-## 💡 프로젝트 소개
+backend/.env
 
-### 배경
-
-취업 준비생에게 면접은 가장 큰 관문이지만, 실전처럼 연습하고 **객관적인 피드백**을 받을 기회는 많지 않습니다.
-스터디는 일정 맞추기가 어렵고, 유료 컨설팅은 비용 부담이 큽니다.
-
-### 목표
-
-**답변연습소**는 AI가 면접관 역할을 맡아 언제든 혼자서도 실전 같은 면접을 연습할 수 있도록 돕습니다.
-
-- 🎯 **나에게 맞는 질문** : 이력서와 지원 분야를 바탕으로 질문 생성
-- 📝 **구체적인 피드백** : 답변의 강점과 개선점을 AI가 분석
-- 📈 **눈에 보이는 성장** : 면접 기록과 점수 변화를 한눈에 확인
-
-<br/>
-
-## ✨ 주요 기능
-
-### 1. 회원 인증
-- JWT 기반 회원가입 / 로그인
-- 사용자별 면접 기록 분리 관리
-
-### 2. 맞춤형 AI 면접
-
-| 면접 유형 | 설명 |
-|:---:|---|
-| 💻 **기술 면접** | 직무 관련 CS·기술 지식 질문 |
-| 🙋 **인성 면접** | 경험·가치관 중심의 행동 질문 |
-| 🧩 **케이스 면접** | 상황 판단·문제 해결 능력 질문 |
-
-- **이력서 PDF 업로드** 시 텍스트를 추출해 이력서 기반 꼬리질문 생성
-
-### 3. AI 답변 평가
-- 답변 내용 분석 후 **점수 + 강점 + 개선점** 제공
-- 더 나은 답변 방향 제시
-
-### 4. 면접 기록 관리
-- 지난 면접 질문·답변·피드백 다시 보기
-- 점수 변화로 성장 과정 확인
-
-<br/>
-
-## 🏗 시스템 아키텍처
-
-```mermaid
-flowchart LR
-    U[👤 사용자] --> F[Frontend]
-    F -->|REST API| B[Backend<br/>Node.js / Express]
-    B -->|JWT 인증| B
-    B --> D[(MySQL)]
-    B -->|질문 생성 · 답변 평가| G[Gemini API]
-    G -.->|실패 시 폴백| Q[Groq API]
-
-    subgraph Docker
-        F
-        B
-    end
-```
-
-### 면접 진행 흐름
-
-```mermaid
-sequenceDiagram
-    participant U as 사용자
-    participant S as 서버
-    participant AI as AI (Gemini/Groq)
-
-    U->>S: 면접 유형 선택 + 이력서 업로드
-    S->>S: PDF 텍스트 추출
-    S->>AI: 맞춤 질문 생성 요청
-    AI-->>S: 면접 질문
-    S-->>U: 질문 표시
-    U->>S: 답변 제출
-    S->>AI: 답변 평가 요청
-    AI-->>S: 점수 · 피드백
-    S->>S: 면접 기록 저장
-    S-->>U: 피드백 결과 표시
-```
-
-<br/>
-
-## 🛠 기술 스택
-
-| 구분 | 기술 |
-|:---:|---|
-| **Frontend** | (사용한 프레임워크 입력) |
-| **Backend** | Node.js, Express |
-| **Database** | MySQL |
-| **Auth** | JWT |
-| **AI** | Google Gemini API, Groq API (Fallback) |
-| **Infra** | Docker |
-| **Collaboration** | Git, GitHub |
-
-<br/>
-
-## 📁 프로젝트 구조
-
-```
-capstone-project/
-├── frontend/          # 클라이언트
-│   └── Dockerfile
-├── backend/           # API 서버
-│   ├── routes/        # 라우터
-│   ├── controllers/   # 비즈니스 로직
-│   ├── models/        # DB 모델
-│   ├── middlewares/   # JWT 인증 등
-│   └── Dockerfile
-└── README.md
-```
-
-> 실제 폴더 구조에 맞게 수정해 주세요.
-
-<br/>
-
-## 🚀 시작하기
-
-### 1. 저장소 클론
-
-```bash
-git clone https://github.com/hyunjun041002/capstone-project.git
-cd capstone-project
-```
-
-### 2. 환경 변수 설정
-
-`backend/.env`
-
-```env
-PORT=
-DB_HOST=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
-JWT_SECRET=
+CLIENT_HOST=
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_HOST=
+MYSQL_DATABASE=
+MYSQL_PORT=
+DATABASE_URL=
+SESSION_TEXT=
+JWT_SECRET_KEY=
 GEMINI_API_KEY=
-GROQ_API_KEY=
-```
-
-### 3. 로컬 실행
-
-```bash
-# Backend
+로컬 실행
+bash
+# backend
 cd backend
 npm install
-npm start
+npx prisma generate
+npm run dev
 
-# Frontend (새 터미널)
+# frontend
 cd frontend
 npm install
-npm start
-```
-
-### 4. Docker로 실행
-
-```bash
+npm run dev
+Docker
+bash
 docker build -t capstone-backend ./backend
 docker build -t capstone-frontend ./frontend
 
 docker run -d -p 3000:3000 --env-file backend/.env capstone-backend
-docker run -d -p 80:80 capstone-frontend
-```
+docker run -d -p 5173:5173 capstone-frontend
+Kubernetes
+bash
+kubectl apply -f kubernetes/sql
+kubectl apply -f kubernetes/backend
+kubectl apply -f kubernetes/frontend
 
-<br/>
+secret.yaml은 저장소에 포함되어 있지 않으므로 직접 만들어서 적용해야 합니다.
 
-## 🔧 트러블슈팅
-
-<details>
-<summary><b>AI 무료 토큰 한도 초과 문제</b></summary>
-<br/>
-
-**문제** : 무료 AI API 사용량 한도로 인해 요청이 실패하는 경우 발생
-
-**해결** : Gemini API를 기본으로 사용하고, 실패 시 Groq API로 자동 전환하는 **폴백 구조** 적용
-
-</details>
-
-<details>
-<summary><b>이력서 기반 질문 생성</b></summary>
-<br/>
-
-**문제** : PDF 파일을 AI에 그대로 전달하기 어려움
-
-**해결** : 서버에서 PDF 텍스트를 추출한 뒤 프롬프트에 포함해 맞춤 질문 생성
-
-</details>
-
-<br/>
-
-<div align="center">
-
-**답변연습소** · 컴퓨터소프트웨어학과 캡스톤 디자인
-
-</div>
+개발하면서 겪은 문제
+Gemini 무료 사용량 초과 무료 API 키는 요청 횟수 제한이 있어서 시연 중에 응답이 끊기는 경우가 있었습니다. 서버에서 429 에러가 나면 프론트에서 API 키 발급 페이지로 이동하도록 처리했습니다.
+AI 응답 형식이 매번 다름 JSON으로 달라고 해도 앞뒤에 설명이 붙어서 오는 경우가 많아서, 응답에서 JSON 부분만 뽑아내는 미들웨어(json.middleware.js)를 따로 만들었습니다.
+면접방 생성 중 오류 시 데이터 꼬임 질문 생성에 실패하면 빈 면접방만 남는 문제가 있어서, 면접방 생성과 질문 저장을 Prisma 트랜잭션으로 묶었습니다.
