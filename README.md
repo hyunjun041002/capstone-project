@@ -4,6 +4,8 @@ AI 기반 모의 면접 연습 서비스
 
 컴퓨터소프트웨어학과 캡스톤 디자인 프로젝트
 
+https://searching-jail-holding-source.trycloudflare.com
+
 <br/>
 
 ## 목차
